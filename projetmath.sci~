@@ -197,7 +197,7 @@ endfunction
 
 //fonction puissance 
 // Calcul du vecteur solution r par la méthode des puissances mis dans une matrice 
-function [r,it] = mp(A, ordreGrandeur)
+function [r,it] = methodePuissance(A, ordreGrandeur)
     n = sqrt(length(A));
     x0 = vectrand(n);
     r = x0; //Initialisation, on peut prendre différentes valeurs mais pas le vecteur nul (fonction spécial pour le faire) doit etre formé de zero et de 1
@@ -214,13 +214,13 @@ endfunction
 //reccuperation du vecteur propre associé à 1
 function r=v(A, og)
     n = sqrt(length(A));
-    B = mp(A,og);
+    B = methodePuissance(A,og);
     for (i = 1:n)
         r(i) = B(i, 1);
     end
 endfunction
 
-function [r,it] = mpN(A, ordreGrandeur)
+function [r,it] = methodePuissanceN(A, ordreGrandeur)
     n = sqrt(length(A));
     x0 = qC(vectrand(n)); //
     r = x0; //Initialisation, on peut prendre différentes valeurs mais pas le vecteur nul (fonction spécial pour le faire) doit etre formé de zero et de 1
@@ -237,16 +237,13 @@ endfunction
 //reccuperation du vecteur propre associé à 1
 function r=vN(A, og)
     n = sqrt(length(A));
-    B = mpN(A,og);
+    B = methodePuissanceN(A,og);
     for (i = 1:n)
         r(i) = B(i, 1);
     end
 endfunction
 
-//fonction de la méthode des puissance amélioré la deuxième fois (plus rapide)
-function r = mp2(Q, alpha, it)
-    n = sqrt(length(Q));
-    x0 = qC(vectrand(n)); //
+function r = methodePuissance2(Q, e, x0, alpha, Nb, it)
     r = x0./norm(x0,1);
     tmp = ones(Q) ; //Matrice temporaire
     somme = zeros(Q); //Somme des matrices temporaires
@@ -254,62 +251,5 @@ function r = mp2(Q, alpha, it)
         somme = somme + tmp ; //Ajout de l'itération actuelle
         tmp = alpha * Q * tmp; //Calcul de la nouvelle itération
     end
-    r = tmp * x0./norm(x0,1) + somme * (((1-norm(alpha*Q,1))/n).*e(n)) ; //Calcul de la valeur finale
-endfunction
-
-// fonction parcourant tout l'algorithme, il suffit de donner la matrice C, alpha (proche de 1) et l'ordre de grandeur
-function [C,Q,P,A,t,r] = algo(C, alpha, og)
-    Q = q(C);
-    P = p(C);
-    A = a(C, alpha);
-    r =mp(A, og);
-    t = A*r -r;
-endfunction
-
-// fonction parcourant tout l'algorithme normé, il suffit de donner la matrice C, alpha (proche de 1) et l'ordre de grandeur
-function [C,Q,P,A,t,r] = algoN(C, alpha, og)
-    Q = q(C);
-    P = p(C);
-    A = a(C, alpha);
-    r =mpN(A, og);
-    t = A*r -r;
-endfunction
-
-// fonction parcourant tout l'algorithme amélioré, il suffit de donner la matrice C, alpha (proche de 1) et l'ordre de grandeur
-function [C,Q,P,A,t,r] = algo2(C, alpha, og)
-    Q = q(C);
-    P = p(C);
-    A = a(C, alpha);
-    r =mp2(Q, alpha, og);
-    t = A*r -r;
-endfunction
-
-// fonction parcourant tout l'algorithme, il suffit de donner la taille de la matrice et il la génère automatiquement, il faut aussi donner alpha (proche de 1) et l'ordre de grandeur
-function [C,Q,P,A,t,r] = algoauto(n, alpha, og)
-    C = matricerand(n);
-    Q = q(C);
-    P = p(C);
-    A = a(C, alpha);
-    r =mp(A, og);
-    t = A*r -r;
-endfunction
-
-// fonction parcourant tout l'algorithme normé, il suffit de donner la taille de la matrice et il la génère automatiquement, il faut aussi donner alpha (proche de 1) et l'ordre de grandeur
-function [C,Q,P,A,t,r] = algoautoN(n, alpha, og)
-    C = matricerand(n);
-    Q = q(C);
-    P = p(C);
-    A = a(C, alpha);
-    r =mpN(A, og);
-    t = A*r -r;
-endfunction
-
-// fonction parcourant tout l'algorithme amélioré, il suffit de donner la taille de la matrice et il la génère automatiquement, il faut aussi donner alpha (proche de 1) et l'ordre de grandeur
-function [C,Q,P,A,t,r] = algoauto2(n, alpha, og)
-    C = matricerand(n);
-    Q = q(C);
-    P = p(C);
-    A = a(C, alpha);
-    r =mp2(Q, alpha, og);
-    t = A*r -r;
+    r = tmp * r + somme * (((1-norm(alpha*Q,1))/Nb).*e) ; //Calcul de la valeur finale
 endfunction
